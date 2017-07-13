@@ -1,54 +1,31 @@
 package com.jzsec.quotation.message;
 
 public class Response implements Message {
-	private long reqId;
-	private int respCode;
-	private String paramType="";
-	private Object responseEntry;
-	private String error="";
+	private int msgType;
+	private byte[] body;
+	private int checksum;
 
-	public Response() {
-
+	public int getMsgType() {
+		return msgType;
 	}
 
-	public long getReqId() {
-		return reqId;
+	public void setMsgType(int msgType) {
+		this.msgType = msgType;
 	}
 
-	public void setReqId(long reqId) {
-		this.reqId = reqId;
+	public byte[] getBody() {
+		return body;
 	}
 
-	public int getRespCode() {
-		return respCode;
+	public void setBody(byte[] body) {
+		this.body = body;
 	}
 
-	public void setRespCode(int respCode) {
-		this.respCode = respCode;
+	public int getChecksum() {
+		return checksum;
 	}
 
-	public Object getResponseEntry() {
-		return responseEntry;
+	public void setChecksum(int checksum) {
+		this.checksum = checksum;
 	}
-
-	public void setResponseEntry(Object responseEntry) {
-		this.responseEntry = responseEntry;
-	}
-
-	public String getError() {
-		return error;
-	}
-
-	public void setError(String error) {
-		this.error = error;
-	}
-
-	public String getParamType() {
-		return paramType;
-	}
-
-	public void setParamType(String paramType) {
-		this.paramType = paramType;
-	}
-
 }

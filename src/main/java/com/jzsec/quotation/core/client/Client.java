@@ -10,7 +10,7 @@ public interface Client {
 
 	public void connect() throws IOException;
 
-	public boolean login(Request p) throws IOException;
+	public void login() throws IOException;
 	
 	public boolean isActive();
 

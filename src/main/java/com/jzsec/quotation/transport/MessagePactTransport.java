@@ -14,7 +14,7 @@ public class MessagePactTransport implements Transport {
 	}
 
 	public ChannelHandlerAdapter getDecoder() {
-		return new MessagePackDecoder(65535, 4, 4);
+		return new MessagePackDecoder(65535, 4, 4, 4);
 	}
 
 }

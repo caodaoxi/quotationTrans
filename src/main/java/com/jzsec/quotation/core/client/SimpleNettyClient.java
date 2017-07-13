@@ -10,17 +10,14 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class SimpleNettyClient extends NettyClient<Request, Response> {
+public class SimpleNettyClient extends NettyClient<Request, Response>  {
 
 	private Bootstrap bootstrap;
-	private List<Channel> sessions = new LinkedList<Channel>();
-	private List<String> serverAddress;
+	private Channel session = null;
+	private String serverAddress;
 	private AtomicInteger index = new AtomicInteger(0);
 	private AtomicBoolean state = new AtomicBoolean(false);
 	private Transport transport;
@@ -44,46 +41,52 @@ public class SimpleNettyClient extends NettyClient<Request, Response> {
 								(SimpleNettyClientHandler) handler);
 			}
 		});
-		this.serverAddress = Arrays.asList(address.split(","));
+		this.serverAddress = address;
 	}
 
 	public void close() throws IOException {
 		if (state.compareAndSet(true, false)) {
-			for (Channel c : sessions) {
-				c.close();
-			}
-			sessions.clear();
+			session.close();
+			session = null;
 		}
 	}
 
 	public void connect() throws IOException {
-		if (state.compareAndSet(false, true)) {
-			for (String address : serverAddress) {
-				String[] host = address.split(":");
-				try {
-					ChannelFuture future = bootstrap.connect(host[0],
-							Integer.valueOf(host[1])).sync();
-					sessions.add(future.channel());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			if (sessions.size() == 0) {
-				state.set(false);
-				throw new IOException("can not connect to server ...!");
-			}
+		String[] host = this.serverAddress.split(":");
+		ChannelFuture future = null;
+		try {
+			future = bootstrap.connect(host[0], Integer.valueOf(host[1])).sync();
+			this.session = future.channel();
+//			this.session.closeFuture().sync();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (session == null) {
+			state.set(false);
+			throw new IOException("can not connect to server ...!");
 		}
 	}
 
-	public boolean login(Request p) throws IOException {
-		select().writeAndFlush(p);
-		return true;
+	public void login() throws IOException {
+		Request request = new Request();
+		request.setMsgTpye(1);
+		request.setSourceId("VSS4");
+		request.setTargetId("YL");
+		request.setCreateTime(System.currentTimeMillis());
+		request.setHeartbeat(100);
+		request.setVersion("1.01");
+		request.setPassword("");
+		this.getSession().writeAndFlush(request);
+		try {
+			this.session.closeFuture().sync();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 
-	private Channel select() {
-		index.compareAndSet(sessions.size(), 0);
-		return sessions.get(index.getAndIncrement());
+	private Channel getSession() {
+		return session;
 	}
 
 	public boolean isActive() {

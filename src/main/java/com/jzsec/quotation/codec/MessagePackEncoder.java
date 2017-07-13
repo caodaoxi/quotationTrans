@@ -41,23 +41,23 @@ public class MessagePackEncoder extends MessageToByteEncoder<Message> {
 		MessagePackBufferPacker buffer = new MessagePackBufferPacker(new MessagePack());
 		byte[] data = null;
 		try {
-			data = req.getSourceId().getBytes("UTF-8");
-			buffer.write(data);
-			buffer.write(empty, 0, 20 - data.length);
+//			data = req.getSourceId().getBytes("UTF-8");
+//			buffer.write(data);
+//			buffer.write(empty, 0, 20 - data.length);
 
-			data = req.getTargetId().getBytes("UTF-8");
-			buffer.write(data);
-			buffer.write(empty, 0, 20 - data.length);
+//			data = req.getTargetId().getBytes("UTF-8");
+//			buffer.write(data);
+//			buffer.write(empty, 0, 20 - data.length);
 
-			buffer.write(req.getHeartbeat());
+//			buffer.write(req.getHeartbeat());
 
-			data = req.getPassword().getBytes("UTF-8");
-			buffer.write(data);
-			buffer.write(empty, 0, 16 - data.length);
+//			data = req.getPassword().getBytes("UTF-8");
+//			buffer.write(data);
+//			buffer.write(empty, 0, 16 - data.length);
 
 			data = req.getVersion().getBytes("UTF-8");
 			buffer.write(data);
-			buffer.write(empty, 0, 32 - data.length);
+//			buffer.write(empty, 0, 32 - data.length);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

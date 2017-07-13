@@ -1,92 +1,57 @@
 package com.jzsec.quotation.codec;
 
+import com.jzsec.quotation.message.Response;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import org.msgpack.MessagePack;
-import org.msgpack.unpacker.MessagePackBufferUnpacker;
 
 import java.nio.ByteOrder;
-import java.util.LinkedList;
-import java.util.List;
 
-public class MessagePackDecoder extends LengthFieldBasedFrameDecoder {
+public class MessagePackDecoder extends BodyLengthAdjustFieldBasedFrameDecoder {
 
 	public MessagePackDecoder(ByteOrder byteOrder, int maxFrameLength,
 			int lengthFieldOffset, int lengthFieldLength, int lengthAdjustment,
-			int initialBytesToStrip, boolean failFast) {
+			int initialBytesToStrip, long bodyLengthAdjustment, boolean failFast) {
 		super(byteOrder, maxFrameLength, lengthFieldOffset, lengthFieldLength,
-				lengthAdjustment, initialBytesToStrip, failFast);
+				lengthAdjustment, initialBytesToStrip, bodyLengthAdjustment, failFast);
 	}
 
 	public MessagePackDecoder(int maxFrameLength, int lengthFieldOffset,
 			int lengthFieldLength, int lengthAdjustment,
-			int initialBytesToStrip, boolean failFast) {
+			int initialBytesToStrip, long bodyLengthAdjustment, boolean failFast) {
 		super(maxFrameLength, lengthFieldOffset, lengthFieldLength,
-				lengthAdjustment, initialBytesToStrip, failFast);
+				lengthAdjustment, initialBytesToStrip, bodyLengthAdjustment, failFast);
 	}
 
 	public MessagePackDecoder(int maxFrameLength, int lengthFieldOffset,
-			int lengthFieldLength, int lengthAdjustment, int initialBytesToStrip) {
+			int lengthFieldLength, int lengthAdjustment, int initialBytesToStrip, long bodyLengthAdjustment) {
 		super(maxFrameLength, lengthFieldOffset, lengthFieldLength,
-				lengthAdjustment, initialBytesToStrip);
+				lengthAdjustment, initialBytesToStrip,bodyLengthAdjustment );
 	}
 
 	public MessagePackDecoder(int maxFrameLength, int lengthFieldOffset,
-			int lengthFieldLength) {
-		super(maxFrameLength, lengthFieldOffset, lengthFieldLength);
+			int lengthFieldLength, long bodyLengthAdjustment) {
+		super(maxFrameLength, lengthFieldOffset, lengthFieldLength, bodyLengthAdjustment);
 	}
 
 	@Override
 	protected Object decode(ChannelHandlerContext ctx, ByteBuf in)
 			throws Exception {
 		Object frame = super.decode(ctx, in);
+		Response response = new Response();
 		if (frame != null && frame instanceof ByteBuf) {
 			ByteBuf buf = (ByteBuf) frame;
+			int msgType = buf.readInt();
+			response.setMsgType(msgType);
 			int size = buf.readInt();
-			byte[] context = new byte[size];
-			buf.readBytes(context);
-			MessagePackBufferUnpacker unpacker = new MessagePackBufferUnpacker(
-					new MessagePack(), size);
-			unpacker.feed(context);
-			Message message = warpMessage(unpacker);
-			unpacker.close();
+			byte[] body = new byte[size];
+			buf.readBytes(body);
+			response.setBody(body);
+			int checkSum = buf.readInt();
+			response.setChecksum(checkSum);
 			buf.release();
-			return message;
+			return response;
 		}
 		return null;
-	}
-
-	private Message warpMessage(MessagePackBufferUnpacker unpacker)
-			throws Exception {
-		int msgType = unpacker.readInt();
-		if (0 == msgType) {
-			Request req = new Request(unpacker.readLong());
-			req.setClassName(unpacker.readString());
-			req.setMethodName(unpacker.readString());
-			req.setParamTypes(unpacker.readString());
-			if (null != req.getParamTypes()
-					&& !"".equals(req.getParamTypes().trim())) {
-				List<Object> params = new LinkedList<Object>();
-				for (String type : req.getParamTypes().split(",")) {
-					params.add(unpacker.read(Class.forName(type)));
-				}
-				req.setParamValues(params);
-			}
-			return req;
-		} else {
-			Response resp = new Response();
-			resp.setReqId(unpacker.readLong());
-			resp.setRespCode(unpacker.readInt());
-			resp.setParamType(unpacker.readString());
-			resp.setError(unpacker.readString());
-			if (null != resp.getParamType()
-					&& !"".equals(resp.getParamType().trim())) {
-				resp.setResponseEntry(unpacker.read(Class.forName(resp
-						.getParamType())));
-			}
-			return resp;
-		}
 	}
 
 }
