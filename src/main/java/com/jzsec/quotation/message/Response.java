@@ -3,7 +3,6 @@ package com.jzsec.quotation.message;
 public class Response implements Message {
 	private int msgType;
 	private byte[] body;
-	private int checksum;
 
 	public int getMsgType() {
 		return msgType;
@@ -19,13 +18,5 @@ public class Response implements Message {
 
 	public void setBody(byte[] body) {
 		this.body = body;
-	}
-
-	public int getChecksum() {
-		return checksum;
-	}
-
-	public void setChecksum(int checksum) {
-		this.checksum = checksum;
 	}
 }

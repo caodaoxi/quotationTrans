@@ -3,33 +3,21 @@ package com.jzsec.quotation.queue;
 import com.jzsec.quotation.message.Message;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.LinkedTransferQueue;
 
 /**
  * Created by caodaoxi on 17-7-13.
  */
 public class MsgQueueManager  {
-    public final BlockingQueue<Message> messageQueue;
+    BlockingQueue<Message> queues = new LinkedBlockingQueue<Message>(1000);
 
-    private MsgQueueManager() {
-        messageQueue = new LinkedTransferQueue<Message>();
+    public void put(Message message) throws InterruptedException {
+        queues.put(message);
     }
 
-    public void put(Message msg) {
-        try {
-            messageQueue.put(msg);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    public Message take() {
-        try {
-            return messageQueue.take();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        return null;
+    public Message take() throws InterruptedException {
+        return queues.take();
     }
 
 

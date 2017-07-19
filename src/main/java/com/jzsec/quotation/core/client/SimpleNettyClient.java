@@ -1,6 +1,8 @@
 package com.jzsec.quotation.core.client;
 
 import com.jzsec.quotation.handler.SimpleNettyClientHandler;
+import com.jzsec.quotation.message.Hearbeat;
+import com.jzsec.quotation.message.LoginBody;
 import com.jzsec.quotation.message.Request;
 import com.jzsec.quotation.message.Response;
 import com.jzsec.quotation.transport.Transport;
@@ -8,8 +10,12 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.apache.commons.configuration.XMLConfiguration;
 
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -19,12 +25,16 @@ public class SimpleNettyClient extends NettyClient<Request, Response>  {
 	private Channel session = null;
 	private String serverAddress;
 	private AtomicInteger index = new AtomicInteger(0);
-	private AtomicBoolean state = new AtomicBoolean(false);
 	private Transport transport;
-	public SimpleNettyClient(String address, Transport transport) {
+	private CountDownLatch latch = new CountDownLatch(1);
+	private XMLConfiguration config = null;
+
+	public SimpleNettyClient(Transport transport, XMLConfiguration config) {
 		EventLoopGroup work = new NioEventLoopGroup(10);
 		this.transport = transport;
-		handler = new SimpleNettyClientHandler();
+		this.config = config;
+		this.serverAddress = config.getString("tsConfig.socketAddress") + ":" + config.getString("tsConfig.socketPort");
+		handler = new SimpleNettyClientHandler(this, config);
 		bootstrap = new Bootstrap();
 		bootstrap.group(work);
 		bootstrap.option(ChannelOption.TCP_NODELAY, true);
@@ -41,7 +51,6 @@ public class SimpleNettyClient extends NettyClient<Request, Response>  {
 								(SimpleNettyClientHandler) handler);
 			}
 		});
-		this.serverAddress = address;
 	}
 
 	public void close() throws IOException {
@@ -67,23 +76,41 @@ public class SimpleNettyClient extends NettyClient<Request, Response>  {
 		}
 	}
 
-	public void login() throws IOException {
+	public void login(long timeout) throws IOException, TimeoutException, InterruptedException {
 		Request request = new Request();
+		LoginBody loginBody = new LoginBody();
 		request.setMsgTpye(1);
-		request.setSourceId("VSS4");
-		request.setTargetId("YL");
-		request.setCreateTime(System.currentTimeMillis());
-		request.setHeartbeat(100);
-		request.setVersion("1.01");
-		request.setPassword("");
+		loginBody.setSourceId(config.getString("tsConfig.senderCompID"));
+		loginBody.setTargetId(config.getString("tsConfig.targetCompID"));
+		loginBody.setCreateTime(System.currentTimeMillis());
+		loginBody.setHeartbeat(config.getInt("tsConfig.hearbeat"));
+		loginBody.setVersion(config.getString("tsConfig.defaultAppVerID"));
+		loginBody.setPassword(config.getString("tsConfig.password"));
+		request.setBody(loginBody);
 		this.getSession().writeAndFlush(request);
-		try {
-			this.session.closeFuture().sync();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+
+		if (-1 == timeout) {
+			this.latch.await();
+		} else {
+			this.latch.await(timeout, TimeUnit.SECONDS);
+		}
+		if (this.isActive() == false) {
+			throw new TimeoutException("Login time out");
+		} else {
+			new Thread(new Runnable() {
+				public void run() {
+					while (true) {
+						SimpleNettyClient.this.sendHearbeat();
+						try {
+							Thread.sleep(config.getInt("tsConfig.hearbeat")/2);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}).start();
 		}
 	}
-
 
 	private Channel getSession() {
 		return session;
@@ -93,4 +120,15 @@ public class SimpleNettyClient extends NettyClient<Request, Response>  {
 		return state.get();
 	}
 
+	public void setActive(boolean isActive) {
+		state.set(isActive);
+	}
+
+	public void sendHearbeat() {
+		Request request = new Request();
+		request.setMsgTpye(3);
+		Hearbeat hearbeat = new Hearbeat();
+		request.setBody(hearbeat);
+		this.getSession().writeAndFlush(request);
+	}
 }
