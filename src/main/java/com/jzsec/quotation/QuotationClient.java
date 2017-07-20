@@ -16,7 +16,10 @@ import java.util.concurrent.TimeoutException;
 public class QuotationClient {
     public static void main(String[] args) {
         try {
-            XMLConfiguration config = new XMLConfiguration("quotation.xml");
+            if(args.length < 1) {
+                throw new Exception("quotation config file Not specified");
+            }
+            XMLConfiguration config = new XMLConfiguration(args[0]);
             SimpleProxyFactory factory = new SimpleProxyFactory(new MessagePactTransport(), config);
             Client client = factory.getClient();
             client.connect();
@@ -28,6 +31,8 @@ public class QuotationClient {
         } catch (TimeoutException e) {
             e.printStackTrace();
         } catch (ConfigurationException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

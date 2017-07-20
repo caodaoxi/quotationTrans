@@ -12,6 +12,8 @@ public class Quotation {
     private String name = "";
     //证券代码
     private String code;
+    //前日收盘价
+    private float preClosePrice;
     //收盘价
     private float closePrice;
     //今日开盘价
@@ -412,48 +414,57 @@ public class Quotation {
         this.isSuspension = isSuspension;
     }
 
+    public float getPreClosePrice() {
+        return preClosePrice;
+    }
+
+    public void setPreClosePrice(float preClosePrice) {
+        this.preClosePrice = preClosePrice;
+    }
+
     @Override
     public String toString() {
         return "Quotation{" +
-                "time=" + time +
-                ", name='" + name + '\'' +
-                ", code='" + code + '\'' +
-                ", closePrice=" + closePrice +
-                ", openPrice=" + openPrice +
-                ", highPrice=" + highPrice +
-                ", lowPrice=" + lowPrice +
-                ", currentPrice=" + currentPrice +
-                ", totalMoney=" + totalMoney +
-                ", totalAmount=" + totalAmount +
-                ", revenue=" + revenue +
-                ", curAmount=" + curAmount +
-                ", outAmount=" + outAmount +
-                ", inAmount=" + inAmount +
-                ", buyPrice1=" + buyPrice1 +
-                ", buyAmount1=" + buyAmount1 +
-                ", buyPrice2=" + buyPrice2 +
-                ", buyAmount2=" + buyAmount2 +
-                ", buyPrice3=" + buyPrice3 +
-                ", buyAmount3=" + buyAmount3 +
-                ", buyPrice4=" + buyPrice4 +
-                ", buyAmount4=" + buyAmount4 +
-                ", buyPrice5=" + buyPrice5 +
-                ", buyAmount5=" + buyAmount5 +
-                ", sellPrice1=" + sellPrice1 +
-                ", sellAmount1=" + sellAmount1 +
-                ", sellPrice2=" + sellPrice2 +
-                ", sellAmount2=" + sellAmount2 +
-                ", sellPrice3=" + sellPrice3 +
-                ", sellAmount3=" + sellAmount3 +
-                ", sellPrice4=" + sellPrice4 +
-                ", sellAmount4=" + sellAmount4 +
-                ", sellPrice5=" + sellPrice5 +
-                ", sellAmount5=" + sellAmount5 +
-                ", oldTotalMoney=" + oldTotalMoney +
-                ", oldTotalAmount=" + oldTotalAmount +
-                ", pricrStatus='" + pricrStatus + '\'' +
+                "isSuspension='" + isSuspension + '\'' +
                 ", tradingPhaseCode='" + tradingPhaseCode + '\'' +
-                ", isSuspension='" + isSuspension + '\'' +
+                ", pricrStatus='" + pricrStatus + '\'' +
+                ", oldTotalAmount=" + oldTotalAmount +
+                ", oldTotalMoney=" + oldTotalMoney +
+                ", sellAmount5=" + sellAmount5 +
+                ", sellPrice5=" + sellPrice5 +
+                ", sellAmount4=" + sellAmount4 +
+                ", sellPrice4=" + sellPrice4 +
+                ", sellAmount3=" + sellAmount3 +
+                ", sellPrice3=" + sellPrice3 +
+                ", sellAmount2=" + sellAmount2 +
+                ", sellPrice2=" + sellPrice2 +
+                ", sellAmount1=" + sellAmount1 +
+                ", sellPrice1=" + sellPrice1 +
+                ", buyAmount5=" + buyAmount5 +
+                ", buyPrice5=" + buyPrice5 +
+                ", buyAmount4=" + buyAmount4 +
+                ", buyPrice4=" + buyPrice4 +
+                ", buyAmount3=" + buyAmount3 +
+                ", buyPrice3=" + buyPrice3 +
+                ", buyAmount2=" + buyAmount2 +
+                ", buyPrice2=" + buyPrice2 +
+                ", buyAmount1=" + buyAmount1 +
+                ", buyPrice1=" + buyPrice1 +
+                ", inAmount=" + inAmount +
+                ", outAmount=" + outAmount +
+                ", curAmount=" + curAmount +
+                ", revenue=" + revenue +
+                ", totalAmount=" + totalAmount +
+                ", totalMoney=" + totalMoney +
+                ", currentPrice=" + currentPrice +
+                ", lowPrice=" + lowPrice +
+                ", highPrice=" + highPrice +
+                ", openPrice=" + openPrice +
+                ", closePrice=" + closePrice +
+                ", preClosePrice=" + preClosePrice +
+                ", code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", time=" + time +
                 '}';
     }
 }

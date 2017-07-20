@@ -3,6 +3,7 @@ package com.jzsec.quotation.core.client;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.log4j.Logger;
 
 import java.util.Properties;
 
@@ -10,6 +11,7 @@ import java.util.Properties;
  * Created by caodaoxi on 17-7-18.
  */
 public class KafkaClient {
+    public static Logger LOG = Logger.getLogger(KafkaClient.class);
     private KafkaProducer<String, String> producer;
     private String topic;
 
@@ -29,7 +31,8 @@ public class KafkaClient {
     }
 
     public void send(String key, String message) {
-       producer.send(new ProducerRecord<String, String>(topic, message));
+        producer.send(new ProducerRecord<String, String>(topic, message));
+        LOG.info(message);
     }
 
     public void close() {

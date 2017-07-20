@@ -26,9 +26,9 @@ public class MessagePackEncoder extends MessageToByteEncoder<Message> {
 			byte[] bytes = body.encode();
 			int checkSum = getCheckSum(req, bytes);
 			byte[] requestBytes = encodeRequest(req, bytes, checkSum);
-			if(body instanceof Hearbeat) {
-				System.out.println("heabeat : " + Arrays.toString(requestBytes));
-			}
+//			if(body instanceof Hearbeat) {
+//				System.out.println("heabeat : " + Arrays.toString(requestBytes));
+//			}
 			out.writeBytes(requestBytes);
 		}
 	}

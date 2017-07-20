@@ -65,7 +65,7 @@ public class QuotationParser implements Parser{
 
         quotation.setTime(DateUtil.formetDate(origTime));
         quotation.setCode(stkcode);
-        quotation.setClosePrice(prevClosePx/10000);
+        quotation.setPreClosePrice(prevClosePx/10000);
         quotation.setTotalAmount(totalVolumeTrade/100);
         quotation.setTotalMoney(totalValueTrade/10000);
         if ("010".equals(hqType) || "020".equals(hqType)) {
@@ -166,7 +166,7 @@ public class QuotationParser implements Parser{
                 // 2为最新价
                 quotation.setCurrentPrice(mdEntryPx/1000000);
                 if(quotation.getCurrentPrice() == 0){
-                    quotation.setCurrentPrice(quotation.getClosePrice());
+                    quotation.setCurrentPrice(quotation.getPreClosePrice());
                 }
             } else if (mdEntryType.equals("4")) {
                 // 4为开盘价
@@ -198,9 +198,10 @@ public class QuotationParser implements Parser{
             if (MDEntryType.trim().equals("3")) {
                 // 当前指数
                 quotation.setCurrentPrice(mdEntryPx/1000000);
+                quotation.setClosePrice(mdEntryPx/1000000);
             } else if (MDEntryType.trim().equals("xa")) {
                 // 昨日收盘指数
-                quotation.setClosePrice(mdEntryPx/1000000);
+                quotation.setPreClosePrice(mdEntryPx/1000000);
             } else if (MDEntryType.trim().equals("xb")) {
                 // 开盘指数
                 quotation.setOpenPrice(mdEntryPx/1000000);
