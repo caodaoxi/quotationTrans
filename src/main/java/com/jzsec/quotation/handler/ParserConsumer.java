@@ -40,10 +40,10 @@ public class ParserConsumer implements Runnable {
                 Parser parser = getParser(response.getMsgType());
                 if(parser != null) {
                     parseVal = parser.parse(response.getBody());
-//                    kafkaClient.send("", JSONObject.fromObject(parseVal).toString());
-                    if("399001".equals(((Quotation)parseVal).getCode())) {
-                        System.out.println("延迟：" + (System.currentTimeMillis() - ((Quotation)parseVal).getTime().getTime()) + ", " + parseVal);
-                    }
+                    kafkaClient.send("", JSONObject.fromObject(parseVal).toString());
+//                    if("399001".equals(((Quotation)parseVal).getCode())) {
+//                        System.out.println("延迟：" + (System.currentTimeMillis() - ((Quotation)parseVal).getTime().getTime()) + ", " + parseVal);
+//                    }
                 } else {
 //                    System.out.println(response.getMsgType());
                 }
