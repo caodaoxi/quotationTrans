@@ -32,10 +32,6 @@ public class BytesUtil {
 		return v0 + v1 + v2 + v3;
 	}
 
-	/**
-	 * @param byte[]
-	 * @return int
-	 */
 	public static int byteArray2Int(byte[] b) {
 		byte[] a = new byte[4];
 		int i = a.length - 1, j = b.length - 1;
