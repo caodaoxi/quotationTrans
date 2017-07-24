@@ -89,9 +89,10 @@ public class SHQuotationClient {
                             quotation.setLowPrice(Float.parseFloat(fields[8].trim()));
                             quotation.setCurrentPrice(Float.parseFloat(fields[9].trim()));
                         }
+                        quotation.setMarket(1);
                         kafkaClient.send(quotation.getCode(), JSONObject.fromObject(quotation).toString());
 //                        quotations.add(quotation);
-                        System.out.println(quotation.toString());
+//                        System.out.println(quotation.toString());
                     }
                     lastMarkModified = lastModified;
                     in.close();
