@@ -95,11 +95,13 @@ public class Quotation {
     //现价大于买1 B, 现价小于卖1 S,否则为空
     private String pricrStatus;
 
-    //产品所处交易阶段,0：集合竞价,1：连续竞价,E: 已收盘
+        //产品所处交易阶段,0：集合竞价,1：连续竞价,E: 已收盘
     private String tradingPhaseCode;
 
     //是否停盘,0：正常状态, 1：临时停排, 2：全天停牌
     private String isSuspension;
+
+    private int market = 0;
 
 
     public Date getTime() {
@@ -422,6 +424,14 @@ public class Quotation {
         this.preClosePrice = preClosePrice;
     }
 
+    public int getMarket() {
+        return market;
+    }
+
+    public void setMarket(int market) {
+        this.market = market;
+    }
+
     @Override
     public String toString() {
         return "Quotation{" +
@@ -467,4 +477,5 @@ public class Quotation {
                 ", time=" + time +
                 '}';
     }
+
 }
